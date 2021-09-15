@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<data>
+    <location name="Forbes to Chirundu" tonnes="1000">
+        <route number="0" from="0" to="1"  tonnes="0" links="5" triaxle="3">
+        </route>
+        <route number="1" from="1" to="11" tonnes="165" links="3" triaxle="2">
+        </route>
+        <route number="2" from="11" to="0" tonnes="0" links="3" triaxle="2">
+        </route>
+        <route number="3" from="1" to="11" tonnes="100" links="2" triaxle="1">
+        </route>
+        <route number="4" from="11" to="0" tonnes="0" links="2" triaxle="1">
+        </route>
+    </location>
+    
+    <location name="Forbes to Plumtree" tonnes="1000">
+        <route number="0" from="0" to="1"  tonnes="0" links="6" triaxle="5">
+        </route>
+        <route number="1" from="1" to="8" tonnes="360" links="6" triaxle="5">
+        </route>
+        <route number="2" from="8" to="0" tonnes="0" links="6" triaxle="5">
+        </route>
+    </location>
+    
+    <location name="Forbes to BeitBridge" tonnes="1000">
+        <route number="0" from="0" to="1"  tonnes="0" links="9" triaxle="2">
+        </route>
+        <route number="1" from="1" to="5" tonnes="375" links="9" triaxle="2">
+        </route>
+        <route number="2" from="5" to="0" tonnes="0" links="9" triaxle="2">
+        </route>
+    </location>
+<!--    <location name="Route 2" tonnes="300">
+        <route number="0" to="0-Harare[Depot]" tonnes="300" links="6" triaxle="3" distance="0">
+        </route>
+        <route number="5" to="5-Beitbridge[Bondend warehouse]" tonnes="300" links="6" triaxle="3" distance="582">
+        </route>
+        <route number="6" to="6-Gwanda" tonnes="105" links="3" triaxle="0" distance="56">
+        </route>
+        <route number="7" to="7-Bulawayo" tonnes="105" links="3" triaxle="0" distance="56">
+        </route>
+        <route number="9" to="9-Gweru" tonnes="30" links="0" triaxle="1" distance="0">
+        </route>
+        <route number="3" to="3-Mvuma" tonnes="60" links="0" triaxle="2" distance="0">
+        </route>
+        <route number="0" to="0-Harare[Depot]" tonnes="0" links="6" triaxle="3" distance="0">
+        </route>
+    </location>
+    <location name="Route 3" tonnes="210">
+        <route number="0" to="0-Harare[Depot]" tonnes="210" links="6" triaxle="0" distance="0">
+        </route>
+        <route number="11" to="11-Chirundu[Bondend warehouse]" tonnes="210" links="6" triaxle="0" distance="582">
+        </route>
+        <route number="10" to="10-Chegutu" tonnes="70" links="2" triaxle="0" distance="56">
+        </route>
+        <route number="9" to="9-Gweru" tonnes="35" links="1" triaxle="0" distance="0">
+        </route>
+        <route number="3" to="3-Mvuma" tonnes="105" links="3" triaxle="0" distance="0">
+        </route>
+        <route number="0" to="0-Harare[Depot]" tonnes="0" links="6" triaxle="0" distance="0">
+        </route>
+    </location>
+     <location name="Route 4" tonnes="190">
+        <route number="0" to="0-Harare[Depot]" tonnes="190" links="2" triaxle="4" distance="0">
+            
+        </route>
+        <route number="8" to="8-Plumtree[Bondend warehouse]" tonnes="190" links="2" triaxle="4" distance="582">
+            
+        </route>
+       <route number="7" to="7-Bulawayo" tonnes="60" links="0" triaxle="2" distance="56">
+            
+        </route>
+        <route number="9" to="9-Gweru" tonnes="60" links="0" triaxle="2" distance="0">
+            
+        
+        </route>
+         <route number="10" to="10-Chegutu" tonnes="70" links="2" triaxle="0" distance="56">
+        </route>
+        <route number="0" to="0-Harare[Depot]" tonnes="0" links="2" triaxle="4" distance="0">
+            
+        </route>
+    </location>-->
+    
+    <!--
+    <location name="Beitbridge" tonnes="300">
+        <route number="1" to="Bulawayo" tonnes="105" links="3" triaxle="0" distance="56">
+            
+        </route>
+        <route number="2" to="Gwanda" tonnes="105" links="3" triaxle="0" distance="56">
+            
+        </route>
+        
+        <route number="3" to="Masvingo" tonnes="60" links="0" triaxle="2" distance="56">
+            
+        </route>
+        <route number="4" to="Gweru" tonnes="30" links="0" triaxle="1" distance="56">
+            
+        </route>
+    </location>
+    
+    <location name="Chirundu" tonnes="210">
+        <route number="1" to="Chegutu" tonnes="70" links="2" triaxle="0" distance="56">
+            
+        </route>
+        <route number="2" to="Gweru" tonnes="35" links="1" triaxle="0" distance="56">
+            
+        </route>
+        
+        <route number="3" to="Bulawayo" tonnes="105" links="3" triaxle="0" distance="56">
+            
+        </route>
+    </location>
+    <location name="Plumtree" tonnes="190">
+        <route number="1" to="Bulawayo" tonnes="70" links="2" triaxle="0" distance="56">
+            
+        </route>
+        
+        <route number="2" to="Gweru" tonnes="60" links="0" triaxle="2" distance="56">
+            
+        </route>
+        <route number="3" to="Mvuma" tonnes="60" links="0" triaxle="2" distance="56">
+            
+        </route>
+    </location>
+    
+    <location name="Forbes" tonnes="300">
+        <route number="1" to="Chiredzi" tonnes="210" links="6" triaxle="0" distance="56">
+            
+        </route>
+        <route number="2" to="Mvuma" tonnes="90" links="0" triaxle="3" distance="56">
+            
+        </route>
+        
+    </location> -->
+</data>

@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="prism.css">
+        <script src="prism.js"></script>
+    </head>
+    <body>
+        <p style=" border: 1px solid; padding: 10px;">
+            Code to read data from xml file
+        </p>
+        <pre>
+            <code class="language-java">
+package solver;
+
+import java.io.*;
+import java.net.URL;
+import java.util.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.w3c.dom.*;
+import org.xml.sax.SAXException;
+
+/**
+ *
+ * @author Makoni
+ */
+public class read_data {
+    public Map&ltlocation, List&ltroutes>> getData() throws ParserConfigurationException, SAXException, IOException {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        Document doc = db.parse(new File("xml.xml"));
+        doc.getDocumentElement().normalize();
+        NodeList nodeList = doc.getElementsByTagName("location");
+        Map&ltlocation, List&ltroutes>> data = new LinkedHashMap<>();
+        for (int itr = 0; itr < nodeList.getLength(); itr++) {
+            Node node = nodeList.item(itr);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                Element eElement = (Element) node;
+                String name = eElement.getAttribute("name");
+                int tonz = Integer.parseInt(eElement.getAttribute("tonnes"));
+                NodeList lines = eElement.getElementsByTagName("route");
+                List&ltroutes> li = new LinkedList&lt>();
+                for (int i = 0; i < lines.getLength(); i++) {
+                    Node node1 = lines.item(i);
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                        Element line = (Element) node1;
+                        int to = Integer.parseInt(line.getAttribute("to"));
+                        int tonnes = Integer.parseInt(line.getAttribute("tonnes"));
+                        int links = Integer.parseInt(line.getAttribute("links"));
+                        int triaxle = Integer.parseInt(line.getAttribute("triaxle"));
+                        int number = Integer.parseInt(line.getAttribute("number"));
+                        int from = Integer.parseInt(line.getAttribute("from"));
+                        li.add(new routes(number, triaxle, links, tonnes, to,from));
+                       
+                    }
+                }
+                data.put(new location(tonz, name), li);
+            }
+        }
+        return data;
+    }
+}
+</code>
+        </pre>
+
+        <p style=" border: 1px solid; padding: 10px;">
+            Code to get and display all routes
+        </p>
+        <pre>
+            <code class="language-java">
+            
+package solver;
+
+import java.awt.*;
+import javax.swing.*;
+
+/**
+ *
+ * @author Makoni
+ */
+public class ShowAllRoutes extends JFrame {
+
+    Board board;
+    Solver outer;
+    public ShowAllRoutes(Board board, Solver solv) {
+        this.outer = solv;
+        this.board = board;
+        initComponents();
+    }
+
+    @SuppressWarnings("unchecked")
+    private void initComponents() {
+        jScrollPane1 = new javax.swing.JScrollPane();
+        panel = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        this.setLocation((outer.xx / 2)-300, (outer.yy / 2)-300);
+        setType(java.awt.Window.Type.UTILITY);
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(panel);
+        panel.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 743, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 389, Short.MAX_VALUE)
+        );
+
+        jScrollPane1.setViewportView(panel);
+
+        jLabel2.setForeground(new java.awt.Color(255, 0, 0));
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(128, 128, 128))
+                        .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jScrollPane1)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addContainerGap()
+                                                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                .addContainerGap())
+        );
+        layout.setVerticalGroup(
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(4, 4, 4)
+                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jScrollPane1)
+                                .addContainerGap())
+        );
+
+        pack();
+    }                   
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JPanel panel;
+    private javax.swing.JScrollPane jScrollPane1;
+    // End of variables declaration                   
+
+    public void showRoutes(String from, String to, Set&lString> paths) {
+        jLabel1.setText("Below are All routes from " + from + " to " + to);
+        jLabel2.setText("You can click on the route number to show the route on the graph");
+        panel.setBackground(Color.white);
+        panel.setLayout(null);
+        int i = 1;
+        for (String str : paths) {
+            JButton btn = new JButton("Route " + i);
+            JLabel lab = new JLabel();
+            if (str.startsWith("Shortest")) {
+                str = str.replaceFirst("Shortest", "");
+                lab.setForeground(Color.GREEN);
+            }
+            lab.setText(str);
+            lab.setBounds(100, i * 25, 2000, 20);
+            btn.setBounds(10, i * 25, 80, 20);
+            btn.setForeground(Color.red);
+            btn.setBackground(null);
+            btn.setBorder(null);
+            btn.setFocusPainted(false);
+            btn.setFocusable(false);
+            panel.add(btn);
+            panel.add(lab);
+            panel.setPreferredSize(new Dimension(1500,(i*25)+30));
+            i++;
+        }
+        panel.repaint();
+
+    }
+
+}
+ 
+</code>
+        </pre>
+        
+        <p style=" border: 1px solid; padding: 10px;">
+            Code to display the tale of routes with tonnes and number of vehicles
+        </p>
+        <pre>
+            <code class="language-java">
+         
+package solver;
+
+import java.awt.*;
+import java.io.IOException;
+import java.util.*;
+import javax.swing.*;
+import javax.xml.parsers.ParserConfigurationException;
+import org.xml.sax.SAXException;
+
+/**
+ *
+ * @author Makoni
+ */
+public class Project extends JFrame {
+
+    public Solver solver;
+
+    public Project(solver.Solver solve) {
+        this.solver = solve;
+        init();
+    }
+
+    private void init() {
+
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jPanel1 = new javax.swing.JPanel();
+        
+        jPanel1.setLayout(null);
+
+        jScrollPane1.setViewportView(jPanel1);
+        
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 512, Short.MAX_VALUE)
+        );
+
+
+       
+        try {
+            Map&ltlocation, List&ltroutes>> data = new read_data().getData();
+int j=0;
+int prv=0;
+            for (location loc : data.keySet()) {
+                Iterator&ltroutes> n = data.get(loc).iterator();
+                int i = 0;
+                
+                String infor[][] = new String[data.get(loc).size()][4];
+                int  distance = 0;
+                
+                while (n.hasNext()) {
+                    routes k = n.next();
+                    //infor[i][0] = String.valueOf(k.getNumber());
+                   
+                   int frm=k.getFrom(),to=k.getTo();
+                    Set&LTString> paths = new TreeSet<>();
+                    solver.getGg().printAllPaths(frm, to, paths);
+                    infor[i][0] = k.getFrom()+"-"+k.getTo();
+                    infor[i][1] = k.getNum_vehicles();
+                    infor[i][2] = String.valueOf(k.getTonnes());
+                    
+                    infor[i][3] = String.valueOf(distance+solver.getBoard().getLowest(frm, to, paths));
+                     distance = distance + solver.getBoard().getLowest(frm, to, paths);
+                    if(k.getTo()==0){
+                        Set&LTString> pathsz = new TreeSet<>();
+                        solver.getGg().printAllPaths(0, 1, pathsz);
+                         distance = solver.getBoard().getLowest(0, 1, pathsz);
+                    }
+                    i++;
+                }
+                String name = loc.getName();
+                
+                this.drawTables(infor,name,prv,i*25);
+                prv=prv+(i*34);
+                j++;
+            }
+
+        } catch (ParserConfigurationException ex) {
+            Logger.getLogger(Project.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SAXException ex) {
+            Logger.getLogger(Project.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Project.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    // Variables declaration - do not modify                    
+
+    void drawTables(Object table[][],String name,int num,int height) {
+        JLabel label=new JLabel(name);
+        label.setBounds(30, num, 300, 20);
+        label.setForeground(Color.red);
+        JTable jTable1 = new javax.swing.JTable();
+      javax.swing.JScrollPane jScrollPane2 = new javax.swing.JScrollPane();
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+                (Object[][]) table,
+                new String[]{
+                    "Client","No. of vehicles", "Quantity(Tonnes)", "Distance(Km)"
+                }
+        ));
+        jTable1.setEnabled(false);
+        jScrollPane2.setViewportView(jTable1);
+        jScrollPane2.setBounds(0,num+25,850, height);
+        jPanel1.setPreferredSize(new Dimension(850,num+height+25));
+        jPanel1.add(label);
+         jPanel1.add(jScrollPane2);
+        pack();
+    }
+
+    // Variables declaration - do not modify                     
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+   
+}
+
+class routes {
+
+    private int number;
+    private int links;
+    private int triaxle;
+    private int tonnes, from,to;
+    private String num_vehicles;
+    public routes(int number, int triaxle, int links, int tonnes, int to, int distance) {
+        this.setLinks(links);
+        this.setNumber(number);
+        this.setTo(to);
+        this.setTonnes(tonnes);
+        this.setTriaxle(triaxle);
+        this.setFrom(distance);
+        this.setNum_vehicles(links+" links and "+triaxle+" triaxles");
+    }
+}
+
+class location {
+    private int tonnes;
+    private String name;
+
+    public location(int tonnes, String name) {
+        this.setName(name);
+        this.setTonnes(tonnes);
+    }
+}
+
+        </code>
+        </pre>
+         <p style=" border: 1px solid; padding: 10px;">
+           The main class which is the one to draw the map of locations and the distance between each other
+        </p>
+        <pre>
+            <code class="language-java">
+            
+package solver;
+
+import java.awt.*;
+import java.util.*;
+import javax.swing.*;
+
+/**
+ *
+ * @author Makoni
+ */
+class Board extends JPanel {
+
+    int number_of_location = 13;
+    private final Solver outer;
+    Board board;
+    JButton print;
+    String towns[] = {"Harare", "Forbes", "Chiredzi", "Mvuma", "Masvingo", "Beitbridge", "Gwanda", "Bulawayo", "Plumtree", "Gweru", "Chegutu", "Chirundu","Ngundu"};
+    int routes[][] = {{11, 0, 355}, {11, 10, 328}, {0, 1, 273}, {0, 10, 110}, {0, 3, 194}, {1, 2, 324}, {0, 2, 433}, {10, 9, 170}, {9, 7, 162}, {9, 3, 83}, {7, 8, 101}, {7, 6, 127}, {6, 5, 193}, {6, 4, 274}, {4, 3, 102},{5, 12, 193}, {4, 12, 95}, {4, 2, 193},{12,2,96}};
+
+    JTextField viewer[] = new JTextField[13];
+
+    Board(final Solver outer) {
+        this.outer = outer;
+        board = this;
+
+    }
+
+    public void addPopUp(JTextField field, int from, int to, int shortest) {
+        //System.out.println(field.getText()+"  "+from.getName()+" "+to.getName());
+        JPopupMenu menu = new JPopupMenu();
+        Action all_routes = new AbstractAction("Show all routes") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // arbitrary source
+                int s = from;
+                int d = to;
+                Set&ltString> paths = new TreeSet&l>();
+                getOuter().getGg().printAllPaths(s, d, paths);
+                Set&ltString> routes = drawRoutes(s, d, paths, shortest);
+                ShowAllRoutes sh = new ShowAllRoutes(board, getOuter());
+                sh.showRoutes(towns[from], towns[to], routes);
+                sh.setVisible(true);
+            }
+        };
+        menu.add(all_routes);
+        //menu.add(shotest_route);
+        field.setComponentPopupMenu(menu);
+        field.repaint();
+        repaint();
+    }
+
+    Set&ltString> drawRoutes(int from, int to, Set&ltString> paths, int shortest) {
+        //System.out.println("From " + from.getName() + " to " + to.getName() + " " + paths.toString());
+        Iterator&ltString> dat = paths.iterator();
+        int n = -1;
+        Set&ltString> routes = new HashSet&lt>();
+        while (dat.hasNext()) {
+            String str = dat.next();
+            String store = "";
+            int t = 0;
+            for (int i = 0; i < str.length(); i++) {
+                if (i == 0 || i == str.length() - 1) {
+                } else {
+                    char s = str.charAt(i);
+                    store += String.valueOf(s);
+                }
+            }
+            store = store.replaceAll(" ", "");
+            String[] m = store.split(",");
+            String route = "";
+            int ii = 0;
+            for (int i = 0; i < m.length; i++) {
+                int j = Integer.parseInt(m[i]);
+                if (i == 0) {
+                    ii = j;
+                } else {
+                    t += getDistance(ii, j);
+                    if (route.isEmpty()) {
+                        route = towns[ii] + " -->> " + getDistance(ii, j) + " -->> " + (towns[j]);
+
+                    } else {
+                        route += " -->> " + getDistance(ii, j) + "-->>" + (towns[j]);
+                    }
+                    ii = j;
+                }
+            }
+            route += "==>>" + t + "<<";
+            if (t == shortest) {
+                route="Shortest"+route;
+            }
+            if (n != -1) {
+                if (t < n) {
+                    n = t;
+                }
+            } else {
+                n = t;
+            }
+            routes.add(route);
+        }
+        return routes;
+    }
+
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponents(g);
+        doDrawing(g);
+    }
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        setFocusable(false);
+        this.setLayout(null);
+
+        for (int i = 0; i < viewer.length; i++) {
+            if (i != 0) {
+                viewer[i] = new RoundedJTextField(5);
+            } else {
+                viewer[i] = new JTextField();
+            }
+            add(viewer[i]);
+
+            viewer[i].setEditable(false);
+            viewer[i].setText(" " + i + "");
+            this.add(viewer[i]);
+            //new Drag_city(viewer[i], this);
+        }
+        viewer[0].setBounds(429, 66, 20, 20);
+        viewer[1].setBounds(588, 30, 20, 20);
+        viewer[2].setBounds(704, 189, 20, 20);
+        viewer[3].setBounds(510, 198, 20, 20);
+        viewer[4].setBounds(592, 310, 20, 20);
+        viewer[5].setBounds(755, 361, 20, 20);
+        viewer[6].setBounds(648, 493, 20, 20);
+        viewer[7].setBounds(528, 588, 20, 20);
+        viewer[8].setBounds(709, 651, 20, 20);
+        viewer[9].setBounds(410, 390, 20, 20);
+        viewer[10].setBounds(328, 183, 20, 20);
+        viewer[11].setBounds(163, 117, 20, 20);
+        viewer[12].setBounds((592+755)/2, (310+361)/2, 20, 20);
+
+        for (int[] route : routes) {
+            int y = route[1];
+            int x = route[0];
+            getOuter().getGg().addEdge(x, y);
+            getOuter().getGg().addEdge(y, x);
+        }
+    }
+
+    public int getTownByName(String town) {
+        for (int i = 0; i < towns.length; i++) {
+            if (towns[i].equals(town)) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    public int getLowest(int from, int to, Set&ltString> paths) {
+        //System.out.println("From " + from.getName() + " to " + to.getName() + " " + paths.toString());
+        Iterator&ltString> dat = paths.iterator();
+
+        int n = -1;
+        while (dat.hasNext()) {
+            String str = dat.next();
+            int t = 0;
+            str = str.substring(1, str.length() - 1);
+            str = str.replaceAll(" ", "");
+            String[] m = str.split(",");
+            int ii = 0;
+            for (int i = 0; i < m.length; i++) {
+                int j = Integer.parseInt(m[i]);
+                if (i == 0) {
+                    ii = j;
+                } else {
+                    t += getDistance(ii, j);
+                    ii = j;
+                }
+            }
+            if (n != -1) {
+                if (t < n) {
+                    n = t;
+                }
+            } else {
+                n = t;
+            }
+        }
+        return n;
+    }
+
+    public int getDistance(int from, int to) {
+        for (int[] route : routes) {
+            int y = route[1];
+            int x = route[0];
+            if ((x == from && y == to) || (x == to && y == from)) {
+                return route[2];
+            }
+        }
+        return 0;
+    }
+
+    public void doDrawing(Graphics g2) {
+
+        Graphics2D g;
+        g = (Graphics2D) g2;
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setColor(Color.white);
+        g.fillRect(0, 0, this.getWidth(), this.getHeight());
+
+        g.setColor(Color.blue);
+        // g.drawLine(viewer[11].getX() + 10, viewer[11].getY() + 10, viewer[0].getX(), viewer[0].getY() + 10);
+        for (int[] route : routes) {
+            int y = route[1];
+            int x = route[0];
+            int distance = route[2];
+
+            g.drawLine(viewer[x].getX() + 10, viewer[x].getY() + 10, viewer[y].getX(), viewer[y].getY() + 10);
+            g.drawString(String.valueOf(distance), (viewer[x].getX() + viewer[y].getX()) / 2, (viewer[x].getY() + viewer[y].getY()) / 2);
+        }
+
+        g.setColor(Color.black);
+
+        g.drawString("Key:", 955, 40);
+        int n = 40;
+        for (int i = 0; i < towns.length; i++) {
+            n += 15;
+            g.drawString(i + " - " + towns[i], 955, n);
+        }
+
+    }
+
+    /**
+     * @return the outer
+     */
+    public Solver getOuter() {
+        return outer;
+    }
+}
+</code>
+        </pre>
+         <p style=" border: 1px solid; padding: 10px;">
+            The code to display the locations in a table with shortest distances between each other
+        </p>
+        <pre>
+            <code class="language-java">
+       
+package solver;
+
+import java.awt.*;
+import java.util.*;
+import javax.swing.*;
+
+public class shot_distance_table extends javax.swing.JFrame {
+   Board board;
+    Solver outer;
+    /**
+     * Creates new form AllRoutes
+     * @param board
+     * @param solv
+     */
+    public shot_distance_table(Board board,Solver solv) {
+        this.outer=solv;
+        this.board=board;
+        initComponents();
+        drawLabel();
+    }
+
+    @SuppressWarnings("unchecked")                         
+    private void initComponents() {
+        jScrollPane1 = new javax.swing.JScrollPane();
+        panel = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+
+       // setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setType(java.awt.Window.Type.UTILITY);
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(panel);
+        panel.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 743, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 389, Short.MAX_VALUE)
+        );
+
+        jScrollPane1.setViewportView(panel);
+
+        jLabel1.setText("Below is the shortest distance from one location to another.");
+
+        jLabel2.setForeground(new java.awt.Color(255, 0, 0));
+        jLabel2.setText("Rick click on the data to view all the distance and routes from one point to another");
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(128, 128, 128))
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(4, 4, 4)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1)
+                .addContainerGap())
+        );
+
+        pack();
+    }                       
+
+    
+
+    // Variables declaration - do not modify                     
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JPanel panel;
+    private javax.swing.JScrollPane jScrollPane1;
+    // End of variables declaration                   
+
+    
+    
+    private void drawLabel() {
+        panel.setLayout(null);
+        JLabel container = new JLabel();
+        container.setLayout(null);
+        container.setBounds(0, 0, 80 + (13* 65), (13* 30) + 60);
+        JButton cancel1 = new JButton();
+        JLabel statmnt = new JLabel("Shotest distance table");
+        statmnt.setBounds(0, 0, 200, 15);
+        container.add(statmnt);
+        cancel1.setIcon(outer.cancel);
+        cancel1.setBorder(null);
+        cancel1.setBounds(container.getWidth() - 50, 0, 50, 20);
+        cancel1.setBackground(null);
+        cancel1.setFocusCycleRoot(false);
+        cancel1.setFocusable(false);
+        cancel1.setFocusPainted(false);
+        cancel1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                container.setVisible(false); //To change body of generated methods, choose Tools | Templates.
+            }
+        });
+        container.add(cancel1);
+        container.setOpaque(true);
+        container.setBackground(Color.red);
+         Solver.Drag1 drag1 = outer.new Drag1(container, board);
+        JTextField names[] = new JTextField[13];
+        int o = 0;
+        for (String label : board.towns) {
+            //JTextField name=new JTextField();
+            names[o] = new JTextField();
+            names[o].setName(label);
+            names[o].setText(label);
+            o += 1;
+        }
+        int i =13;
+        int k = 0;
+        int l = 1;
+        int p = 2;
+        while (i >=0) {
+            l += (30 * 1);
+            int g = 30;
+            k += 65;
+            int h = l;
+            for (int j = 1; j <= i; j++) {
+                JTextField field = null;
+                if ((j - 1) == 0) {
+                    names[i - 1].setBounds(k, l, 60, 20);
+                    container.add(names[i - 1]);
+                    //System.out.println(i-1+names[i-1].getText());
+                    names[i - 1].setEditable(false);
+                } else {
+                    //System.out.println(p);
+                    field = new JTextField();
+                 int from = board.getTownByName(names[i - 1].getText());
+                int to = board.getTownByName(names[i - p].getName());
+                    Set&ltString> paths = new TreeSet&l>();
+                    int s = from;
+                    int d = to;
+                    outer.getGg().printAllPaths(s, d, paths);
+                    field.setText(String.valueOf(board.getLowest(from, to, paths)));
+                   board.addPopUp(field, from, to,board.getLowest(from, to, paths));
+                    if (p < i) {
+                        p += 1;
+                    } else {
+                        p = 2;
+                    }
+                    h += 30;
+                    field.setBounds(k, h, 60, 20);
+                    field.setEditable(false);
+                    container.add(field);
+                }
+                container.repaint();
+            }
+            //System.out.println(i);
+            i--;
+        }
+       panel.add(container);
+        panel.repaint();
+    }
+}
+</code>
+        </pre>
+          <p style=" border: 1px solid; padding: 10px;">
+              This class stores all the locations available to get other with their neigbour locations.<br>
+              They are stored as Nodes
+        </p>
+        <pre>
+            <code class="language-java">
+                package solver;
+
+
+import java.util.*;
+
+public class Graph {
+
+        // No. of vertices in graph
+        private int v;
+
+        // adjacency list
+        private ArrayList&ltInteger>[] adjList;
+        // Constructor
+        public Graph(int vertices) {
+
+            // initialise vertex count
+            this.v = vertices;
+
+            // initialise adjacency list
+            initAdjList();
+        }
+
+        // utility method to initialise
+        // adjacency list
+        @SuppressWarnings("unchecked")
+        private void initAdjList() {
+            adjList = new ArrayList[v];
+
+            for (int i = 0; i < v; i++) {
+                adjList[i] = new ArrayList<>();
+            }
+        }
+
+        // add edge from u to v
+        public void addEdge(int u, int v) {
+            // Add v to u's list.
+            adjList[u].add(v);
+        }
+        
+        public void remove(int u,int v){
+            adjList[u].remove(v);
+        }
+
+        // Prints all paths from
+        // 's' to 'd'
+        public void printAllPaths(int s, int d, Set&ltString> paths) {
+            boolean[] isVisited = new boolean[v];
+            ArrayList&ltInteger> pathList = new ArrayList<>();
+            // add source to path[]
+            pathList.add(s);
+
+            // Call recursive utility
+            printAllPathsUtil(s, d, isVisited, pathList, paths);
+        }
+
+        // A recursive function to print
+        // all paths from 'u' to 'd'.
+        // isVisited[] keeps track of
+        // vertices in current path.
+        // localPathList<> stores actual
+        // vertices in the current path
+        private void printAllPathsUtil(Integer u, Integer d,
+                boolean[] isVisited,
+                List&ltInteger> localPathList, Set&ltString> paths) {
+
+            if (u.equals(d)) {
+
+                String pat = localPathList.toString();
+
+                paths.add(pat);
+                // if match found then no need to traverse more till depth
+                return;
+            }
+
+            // Mark the current node
+            isVisited[u] = true;
+
+            // Recur for all the vertices
+            // adjacent to current vertex
+            for (Integer i : adjList[u]) {
+                if (!isVisited[i]) {
+                    // store current node
+                    // in path[]
+                    localPathList.add(i);
+                    printAllPathsUtil(i, d, isVisited, localPathList, paths);
+
+                    // remove current node
+                    // in path[]
+                    localPathList.remove(i);
+                }
+            }
+
+            // Mark the current node
+            isVisited[u] = false;
+        }
+
+    }
+</code>
+        </pre>
+    </body>
+</html>
